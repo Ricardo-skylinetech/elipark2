@@ -50,7 +50,7 @@ class Pensiones_model extends CI_Model{
 
         if($todo != 1) {
             // mejorar función en el futuro
-            $where = "(c.contrato=$select OR c.tarjetaSistema=$select OR c.tarjetaFisica=$select OR c.razonSocial=$select)";
+            $where = "(c.contrato='$select' OR c.tarjetaSistema='$select' OR c.tarjetaFisica='$select' OR c.razonSocial='$select')";
             $this->db->where($where);
 
 
@@ -87,7 +87,7 @@ class Pensiones_model extends CI_Model{
 
     // echo $this->db->get_compiled_select();
 
-    // exit();
+     //exit();
      $result = $this->db->get();
       
         $data = array();
