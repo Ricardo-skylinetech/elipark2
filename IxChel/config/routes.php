@@ -134,6 +134,17 @@ $route['insertTarifaCatTrecobros'] = "_Catalogos/_Boletos/Recobros/insertTarifaC
 $route['updateConceptoCatBrecobros'] = "_Catalogos/_Boletos/Recobros/updateConcepto";
 $route['updateTarifaCatTrecobros'] = "_Catalogos/_Boletos/Recobros/updateTarifa";
 
+//Catalogos Boletos Pases
+$route['getCatBPases'] = "_Catalogos/_Boletos/Pases/getCatBPases";
+$route['getCatTPases'] = "_Catalogos/_Boletos/Pases/getCatTPases";
+$route['updateEstatusCatBPases'] = "_Catalogos/_Boletos/Pases/updateEstatusCatBPases";
+$route['updateEstatusCatTPases'] = "_Catalogos/_Boletos/Pases/updateEstatusCatTPases";
+$route['insertConceptoCatBPases'] = "_Catalogos/_Boletos/Pases/insertConceptoCatBPases";
+$route['insertTarifaCatTPases'] = "_Catalogos/_Boletos/Pases/insertTarifaCatTPases";
+$route['updateConceptoCatBPases'] = "_Catalogos/_Boletos/Pases/updateConcepto";
+$route['updateTarifaCatTPases'] = "_Catalogos/_Boletos/Pases/updateTarifa";
+
+
 //Catalogos Boletos Vales a Retornar
 $route['getCatValesRetornar'] = "_Catalogos/_Boletos/ValesRetornar/getCatValesRetornar";
 $route['updateEstatusCatValesRetornar'] = "_Catalogos/_Boletos/ValesRetornar/updateEstatusCatValesRetornar";

@@ -285,7 +285,7 @@
                                 ],
                                 "ajax": {
                                     type: "POST",
-                                    url: "../../getCatBrecobros",
+                                    url: "../../getCatBPases",
                                     dataType: "json",
                                     data: {estatus:estatus}
                                 },
@@ -369,7 +369,7 @@
                             let estatus = $(this).data('estatus');
                             console.log(id);
                             $('.loading').fadeIn('slow');
-                            $.post("../../updateEstatusCatBrecobros", {id:id,estatus:estatus},
+                            $.post("../../updateEstatusCatBPases", {id:id,estatus:estatus},
                             function(result){
                                 $('.loading').fadeOut('slow');
                                 if(result.validacion){
@@ -398,7 +398,7 @@
                             event.preventDefault();
                             var data = $(this).serialize();
                             $('.loading').fadeIn('slow');
-                            $.post('../../insertConceptoCatBrecobros',data,
+                            $.post('../../insertConceptoCatBPases',data,
                             function(result){
                                 $('.loading').fadeOut('slow');
                                 if(result.validacion){
@@ -462,7 +462,7 @@
                             event.preventDefault();
                             var data = $(this).serialize();
                             $('.loading').fadeIn('slow');
-                            $.post('../../updateConceptoCatBrecobros', data,
+                            $.post('../../updateConceptoCatBPases', data,
                             function(result) {
                                 $('.loading').fadeOut('slow');
                                 if(result.validacion){
@@ -512,7 +512,7 @@
                                 ],
                                 "ajax": {
                                     type: "POST",
-                                    url: "../../getCatTrecobros",
+                                    url: "../../getCatTPases",
                                     dataType: "json",
                                     data: {estatus:estatus}
                                 },
@@ -596,7 +596,7 @@
                             let estatus = $(this).data('estatus');
                             console.log(id);
                             $('.loading').fadeIn('slow');
-                            $.post("../../updateEstatusCatTrecobros", {id:id,estatus:estatus},
+                            $.post("../../updateEstatusCatTPases", {id:id,estatus:estatus},
                             function(result){
                                 $('.loading').fadeOut('slow');
                                 if(result.validacion){
@@ -625,7 +625,7 @@
                             event.preventDefault();
                             var data = $(this).serialize();
                             $('.loading').fadeIn('slow');
-                            $.post('../../insertTarifaCatTrecobros',data,
+                            $.post('../../insertTarifaCatTPases',data,
                             function(result){
                                 $('.loading').fadeOut('slow');
                                 if(result.validacion){
@@ -689,7 +689,7 @@
                             event.preventDefault();
                             var data = $(this).serialize();
                             $('.loading').fadeIn('slow');
-                            $.post('../../updateTarifaCatTrecobros', data,
+                            $.post('../../updateTarifaCatTPases', data,
                             function(result) {
                                 $('.loading').fadeOut('slow');
                                 if(result.validacion){

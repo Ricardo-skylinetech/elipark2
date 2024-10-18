@@ -11,37 +11,85 @@ class Pensiones_model extends CI_Model{
         $this->load->database();
     }
 
-    public function getPensiones($select,$estacionamiento,$todo,$activas,$inactivas,$fechaMes)
+    public function getPensiones($select,$estacionamiento,$todo,$activas,$inactivas,$fechaMes,$filtroFoto)
     {
         $year = date('Y');
         $month = date('m');
 
-         if(isset($fechaMes) && $fechaMes!=""){
+
+         if(isset($fechaMes) && $fechaMes!="" AND $filtroFoto==1){
+
+         $finicio = date("Y-m-d", strtotime(sprintf("first day of %s", $fechaMes)));
+        $ffin = date("Y-m-d", strtotime(sprintf("last day of %s", $fechaMes)));
+
+        $this->db->distinct();
+        $this->db->select("c.id_cat_pensiones,c.contrato,c.tarjetaSistema,c.tarjetaFisica,c.razonSocial,c.asignado,c.marca,c.modelo,c.color,c.placas,c.tipoPension,c.costo,c.factura,c.pago,c.venta,c.reposicion,c.recargos,c.fechaDeposito,c.movimiento,c.observaciones,p.fechaAlta, p.fechaBaja, c.estatus, p.fichaPago,p.bandera");
+        $this->db->from("V_cat_pensiones_gral c");
+       // $this->db->join('pensiones p', "c.id_cat_pensiones = p.id_cat_pensiones AND p.fechaAlta BETWEEN '$finicio' AND '$ffin'","left");
+
+        $this->db->join('V_pensiones_gral p', "c.id_cat_pensiones = p.id_cat_pensiones AND p.fechaAlta BETWEEN '$finicio' AND '$ffin'");
+         $where = "`c`.`fechaAlta`=`p`.`fechaAlta` AND p.bandera=1 AND c.estatus=1";
+            $this->db->where($where);
 
 
+        }
+
+       else if(isset($fechaMes) && $fechaMes!="" AND $filtroFoto==0){
+
+
+             
         $finicio = date("Y-m-d", strtotime(sprintf("first day of %s", $fechaMes)));
         $ffin = date("Y-m-d", strtotime(sprintf("last day of %s", $fechaMes)));
 
-
-        $this->db->select("c.id_cat_pensiones,c.contrato,c.tarjetaSistema,c.tarjetaFisica,c.razonSocial,c.asignado,c.marca,c.modelo,c.color,c.placas,c.tipoPension,c.costo,c.factura,c.pago,c.venta,c.reposicion,c.recargos,c.fechaDeposito,c.movimiento,c.observaciones,p.fechaAlta, p.fechaBaja, c.estatus, p.fichaPago");
+        $this->db->distinct();
+        $this->db->select("c.id_cat_pensiones,c.contrato,c.tarjetaSistema,c.tarjetaFisica,c.razonSocial,c.asignado,c.marca,c.modelo,c.color,c.placas,c.tipoPension,c.costo,c.factura,c.pago,c.venta,c.reposicion,c.recargos,c.fechaDeposito,c.movimiento,c.observaciones,p.fechaAlta, p.fechaBaja, c.estatus, p.fichaPago,p.bandera");
         $this->db->from("cat_pensiones c");
        // $this->db->join('pensiones p', "c.id_cat_pensiones = p.id_cat_pensiones AND p.fechaAlta BETWEEN '$finicio' AND '$ffin'","left");
 
         $this->db->join('pensiones p', "c.id_cat_pensiones = p.id_cat_pensiones AND p.fechaAlta BETWEEN '$finicio' AND '$ffin'");
+        // $where = "`c`.`fechaAlta`=`p`.`fechaAlta`";
+           // $this->db->where($where);
 
 
-        }else{
 
-    // Traer pensiones del Corte 6 de cada mes
-        $start_date = "$year-$month-06";
-        $end_date = date("Y-m-05", strtotime("+1 month", strtotime($start_date)));
+        }
 
-        $this->db->select("c.id_cat_pensiones,c.contrato,c.tarjetaSistema,c.tarjetaFisica,c.razonSocial,c.asignado,c.marca,c.modelo,c.color,c.placas,c.tipoPension,c.costo,c.factura,c.pago,c.venta,c.reposicion,c.recargos,c.fechaDeposito,c.movimiento,c.observaciones,p.fechaAlta, p.fechaBaja, c.estatus, p.fichaPago");
-        $this->db->from("cat_pensiones c");
-        //$this->db->join('pensiones p', "c.id_cat_pensiones = p.id_cat_pensiones AND p.fechaAlta BETWEEN '$start_date' AND '$end_date'","left");
-        //$this->db->join('pensiones p', "c.id_cat_pensiones = p.id_cat_pensiones AND p.fechaAlta BETWEEN '$start_date' AND '$end_date'");
+       else if($fechaMes=="" AND $filtroFoto==1){
 
-          $this->db->join('pensiones p', "c.id_cat_pensiones = p.id_cat_pensiones");
+        $finicio = date("Y-m-d", strtotime(sprintf("first day of %s", $fechaMes)));
+        $ffin = date("Y-m-d", strtotime(sprintf("last day of %s", $fechaMes)));
+
+        $this->db->distinct();
+        $this->db->select("c.id_cat_pensiones,c.contrato,c.tarjetaSistema,c.tarjetaFisica,c.razonSocial,c.asignado,c.marca,c.modelo,c.color,c.placas,c.tipoPension,c.costo,c.factura,c.pago,c.venta,c.reposicion,c.recargos,c.fechaDeposito,c.movimiento,c.observaciones,p.fechaAlta, p.fechaBaja, c.estatus, p.fichaPago,p.bandera");
+        $this->db->from("V_cat_pensiones_gral c");
+       // $this->db->join('pensiones p', "c.id_cat_pensiones = p.id_cat_pensiones AND p.fechaAlta BETWEEN '$finicio' AND '$ffin'","left");
+
+        $this->db->join('V_pensiones_gral p', "c.id_cat_pensiones = p.id_cat_pensiones");
+         $where = "`c`.`fechaAlta`=`p`.`fechaAlta` AND p.bandera=1 AND c.estatus=1";
+        $this->db->where($where);
+
+
+
+        }
+
+
+        else{
+
+                 // Traer pensiones del Corte 6 de cada mes
+                $start_date = "$year-$month-06";
+                $end_date = date("Y-m-05", strtotime("+1 month", strtotime($start_date)));
+                $this->db->distinct();
+                $this->db->select("c.id_cat_pensiones,c.contrato,c.tarjetaSistema,c.tarjetaFisica,c.razonSocial,c.asignado,c.marca,c.modelo,c.color,c.placas,c.tipoPension,c.costo,c.factura,c.pago,c.venta,c.reposicion,c.recargos,c.fechaDeposito,c.movimiento,c.observaciones,p.fechaAlta, p.fechaBaja, c.estatus, p.fichaPago,p.bandera");
+                $this->db->from("cat_pensiones c");
+                //$this->db->join('pensiones p', "c.id_cat_pensiones = p.id_cat_pensiones AND p.fechaAlta BETWEEN '$start_date' AND '$end_date'","left");
+                //$this->db->join('pensiones p', "c.id_cat_pensiones = p.id_cat_pensiones AND p.fechaAlta BETWEEN '$start_date' AND '$end_date'");
+
+                $this->db->join('pensiones p', "c.id_cat_pensiones = p.id_cat_pensiones");
+              //   $where = "`c`.`fechaAlta`=`p`.`fechaAlta`";
+                //   $this->db->where($where);
+
+
+    
 
         }
 
@@ -85,9 +133,9 @@ class Pensiones_model extends CI_Model{
             $this->db->where(['c.estatus'=> 0]);
         }
 
-    // echo $this->db->get_compiled_select();
+     //echo $this->db->get_compiled_select();
 
-     //exit();
+   // exit();
      $result = $this->db->get();
       
         $data = array();
@@ -155,7 +203,11 @@ class Pensiones_model extends CI_Model{
                      $row["fichaPago"]=null;
                 }
 
-           
+                if($row["bandera"]==1){
+
+                    $row["fichaPago"]=0;
+                    //echo "desactivar subida";
+                }
 
                 $data[] = array(
                     "id_cat_pensiones" => $row["id_cat_pensiones"],
@@ -187,7 +239,8 @@ class Pensiones_model extends CI_Model{
                     "totaldesactivas"=>$totaldeNoOK,
                     "costoSuma"=>$costoSuma,
                     "costoPago"=>$costoPago,
-                    "totalOtros"=>$totalOtros
+                    "totalOtros"=>$totalOtros,
+                    "bandera"=>$row["bandera"]
 
                     
                 );
@@ -254,7 +307,8 @@ class Pensiones_model extends CI_Model{
 		}
 	}
 
-    public function guardarFicha($id_cat_pensiones, $nombre_archivo) {
+    public function guardarFicha($id_cat_pensiones, $nombre_archivo,$fechaUpdate) {
+
 
 
 
@@ -267,38 +321,127 @@ class Pensiones_model extends CI_Model{
             'creado_por' => $this->session->userdata('id_usuario')
         );
         date_default_timezone_set("America/Chihuahua");
-        $fecha=date("Y-m-d H:i:s");
-
-
-        //validamos si existe el registro $id_cat_pensiones en tabla pensiones cambio 08/07/2024
-
-         /*$this->db->select("id_cat_pensiones");
-         $this->db->from("pensiones");
-         $this->db->where("id_cat_pensiones",$id_cat_pensiones);
-         $result = $this->db->get();
-         $valida=$result->result_array();*
-
-
-         $data["creado_por"] = $this->session->userdata('id_usuario');
-
-       
-         if(count($valida)==0){
-
-           $result = $this->db->insert('pensiones', array("id_cat_pensiones"=>$id_cat_pensiones,"estatus"=>1,"creado_por"=>$data["creado_por"]));
+    
+        $fechaUpdate=$fechaUpdate." 00:00:00";
       
-         }*/
-
-        //fin de validación
-
-        $result =  $this->db->update('cat_pensiones', array("estatus" => 1), array("id_cat_pensiones"=>$id_cat_pensiones));
-
         $result = $this->db->update('pensiones', $data, $where);
-        
         $result =  $this->db->update('pensiones', array("fichaPago" =>$nombre_archivo), array("id_cat_pensiones"=>$id_cat_pensiones));
+        $result =  $this->db->update('pensiones', array("fechaAlta" =>$fechaUpdate), array("id_cat_pensiones"=>$id_cat_pensiones));
 
-       // $result =  $this->db->update('pensiones', array("fechaAlta" =>$fecha), array("id_cat_pensiones"=>$id_cat_pensiones));
+
+       $result =  $this->db->update('cat_pensiones', array("estatus" => 1), array("id_cat_pensiones"=>$id_cat_pensiones)); //ok
+       $result =  $this->db->update('cat_pensiones', array("fechaAlta" =>$fechaUpdate), array("id_cat_pensiones"=>$id_cat_pensiones));
+
+        //consultamos pensiones si la fecha es igual a la fecha de edición no creamos nueva
+
+          $this->db->select("fechaAlta");
+          $this->db->from("pensiones");
+          $this->db->where("id_cat_pensiones",$id_cat_pensiones);
+          $result = $this->db->get();
+          $fechaAlta=$result->result_array();
+
+        //  print_r($fechaAlta[0]['fechaAlta']);
+
+        
+
+         /* if($fechaAlta[0]['fechaAlta']!=$fechaUpdate){
+
+      
+          $result_foto =$this->db->query("INSERT INTO cat_pensiones(
+                            contrato,
+                            fechaAlta,
+                            tarjetaSistema,
+                            tarjetaFisica,
+                            razonSocial,
+                            asignado,
+                            marca,
+                            modelo,
+                            color,
+                            placas,
+                            tipoPension,
+                            estatus,
+                            costo,
+                            factura,
+                            pago,
+                            venta,
+                            reposicion,
+                            recargos,
+                            fechaDeposito,
+                            movimiento,
+                            archivo,
+                            observaciones,
+                            estacionamiento_id,
+                            fechaCreacion,
+                            fechaActualizacion,
+                            creado_por
+
+                            )
+                            SELECT 
+                            contrato,
+                            '$fechaUpdate' as fechaAlta,
+                            tarjetaSistema,
+                            tarjetaFisica,
+                            razonSocial,
+                            asignado,
+                            marca,
+                            modelo,
+                            color,
+                            placas,
+                            tipoPension,
+                            0 as estatus,
+                            costo,
+                            factura,
+                            pago,
+                            venta,
+                            reposicion,
+                            recargos,
+                            fechaDeposito,
+                            movimiento,
+                            archivo,
+                            observaciones,
+                            estacionamiento_id,
+                            fechaCreacion,
+                            fechaActualizacion,
+                            creado_por
+                            FROM cat_pensiones
+                            WHERE id_cat_pensiones=$id_cat_pensiones");
+
+
+             $CatpensionID = $this->db->insert_id();
+
+              $result_foto =$this->db->query("
+                                INSERT INTO pensiones(
+                                id_cat_pensiones,
+                                fechaAlta,
+                                estatus,
+                                fichaPago,
+                                ultimaActualizacion,
+                                creado_por,
+                                modificado_por
+                                )
+                                SELECT 
+                                $CatpensionID AS id_cat_pensiones,
+                               '$fechaUpdate' as fechaAlta,
+                                0 as estatus,
+                                fichaPago,
+                                ultimaActualizacion,
+                                creado_por,
+                                modificado_por
+                                FROM pensiones
+                                WHERE id_cat_pensiones=$id_cat_pensiones");
+
+
+
+          }else{
+
+              $result =  $this->db->update('cat_pensiones', array("estatus" => 1), array("id_cat_pensiones"=>$id_cat_pensiones)); //ok
+          }*/
+
+    
 
         $response = array("validacion" => ($result ? true : false), "icon" => "success", "mensaje" => "El archivo ha sido cargado correctamente.");
+
+
         return $response;
 	}
 
@@ -412,11 +555,33 @@ class Pensiones_model extends CI_Model{
     
             if ($result) {
                 $inserted_id = $this->db->insert_id();
+
+
                 $query = $this->db->get_where('cat_pensiones', array('id_cat_pensiones' => $inserted_id));
                 $inserted_data = $query->row_array();
 
                 $result = $this->db->insert('pensiones', array("id_cat_pensiones"=>$inserted_id,"estatus"=>$data['estatus'],"creado_por"=>$data["creado_por"],"fechaAlta"=>$data['fechaAlta']));
-        
+
+               $idCatPension=$inserted_id;
+
+               $pensionID = $this->db->insert_id();
+
+                //flujo para tener la bitácora de pensiones pensiones_foto_mes y  cat_pensiones_foto_mes
+
+                $data['id_cat_pensiones']=$idCatPension;
+
+               /* $result = $this->db->insert('cat_pensiones_foto_mes', $data);
+                $query = $this->db->get_where('cat_pensiones_foto_mes', array('id_cat_pensiones' =>$idCatPension));
+                $inserted_data_foto = $query->row_array();
+
+
+
+                $result_foto = $this->db->insert('pensiones_foto_mes', array("id_pensiones"=>$pensionID ,"id_cat_pensiones"=>$inserted_id,"estatus"=>$data['estatus'],"creado_por"=>$data["creado_por"],"fechaAlta"=>$data['fechaAlta']));*/
+
+
+
+
+                //fin de flujo de pensiones
                 $response = array(
                     "validacion" => true,
                     "icon" => "success",
@@ -441,10 +606,125 @@ class Pensiones_model extends CI_Model{
 
         $where = array("id_cat_pensiones"=>$data['id_cat_pensiones']);
 
+          $id_cat_pensiones=$data['id_cat_pensiones'];
+
+          $this->db->select("fechaAlta");
+          $this->db->from("pensiones");
+          $this->db->where("id_cat_pensiones",$id_cat_pensiones);
+          $result = $this->db->get();
+          $fechaAlta=$result->result_array();
+
+        //  print_r($fechaAlta[0]['fechaAlta']);
+
+          $fechaUpdate=$data['fechaAlta']." 00:00:00";
+
+
+          if($fechaAlta[0]['fechaAlta']!=$fechaUpdate){
+
+           
+          $result_foto =$this->db->query("INSERT INTO cat_pensiones(
+                            contrato,
+                            fechaAlta,
+                            tarjetaSistema,
+                            tarjetaFisica,
+                            razonSocial,
+                            asignado,
+                            marca,
+                            modelo,
+                            color,
+                            placas,
+                            tipoPension,
+                            estatus,
+                            costo,
+                            factura,
+                            pago,
+                            venta,
+                            reposicion,
+                            recargos,
+                            fechaDeposito,
+                            movimiento,
+                            archivo,
+                            observaciones,
+                            estacionamiento_id,
+                            fechaCreacion,
+                            fechaActualizacion,
+                            creado_por
+
+                            )
+                            SELECT 
+                            contrato,
+                            '$fechaUpdate' as fechaAlta,
+                            tarjetaSistema,
+                            tarjetaFisica,
+                            razonSocial,
+                            asignado,
+                            marca,
+                            modelo,
+                            color,
+                            placas,
+                            tipoPension,
+                            0 as estatus,
+                            costo,
+                            factura,
+                            pago,
+                            venta,
+                            reposicion,
+                            recargos,
+                            fechaDeposito,
+                            movimiento,
+                            archivo,
+                            observaciones,
+                            estacionamiento_id,
+                            fechaCreacion,
+                            fechaActualizacion,
+                            creado_por
+                            FROM cat_pensiones
+                            WHERE id_cat_pensiones=$id_cat_pensiones");
+
+
+             $CatpensionID = $this->db->insert_id();
+
+              $result_foto =$this->db->query("
+                                INSERT INTO pensiones(
+                                id_cat_pensiones,
+                                fechaAlta,
+                                estatus,
+                                fichaPago,
+                                ultimaActualizacion,
+                                creado_por,
+                                modificado_por
+                                )
+                                SELECT 
+                                $CatpensionID AS id_cat_pensiones,
+                               '$fechaUpdate' as fechaAlta,
+                                0 as estatus,
+                                fichaPago,
+                                ultimaActualizacion,
+                                creado_por,
+                                modificado_por
+                                FROM pensiones
+                                WHERE id_cat_pensiones=$id_cat_pensiones");
+
+                //fin de mover pensiones
+
+          }
+   
+
+        
+      
+       // $result =  $this->db->update('pensiones', array("fechaAlta"=>$data['fechaAlta']), $where);
+
         $result =  $this->db->update('pensiones', array("estatus"=>$data['estatus']), $where);
+
+        $result =  $this->db->update('cat_pensiones_foto_mes', array("estatus"=>$data['estatus']), $where);
+        //$result =  $this->db->update('pensiones_foto_mes', array("estatus"=>$data['estatus']), $where);
+
         unset($data['id_cat_pensiones']);
 
         $result =  $this->db->update('cat_pensiones', $data, $where);
+
+       // unset($data['fechaAlta']);
+       // $result =  $this->db->update('cat_pensiones_foto_mes', $data, $where);
 
         if ($result) {
             $this->db->select();
@@ -468,14 +748,29 @@ class Pensiones_model extends CI_Model{
         return $response;
     }
 
-    public function extraerHistorico($id_cat_pensiones)
+    public function extraerHistorico($id_cat_pensiones,$contrato,$estacionamiento)
     {
-        $this->db->select("c.id_cat_pensiones,c.contrato,c.tarjetaSistema,c.tarjetaFisica,c.razonSocial,c.asignado,c.marca,c.modelo,c.color,c.placas,c.tipoPension,c.costo,c.factura,c.pago,c.venta,c.reposicion,c.recargos,c.fechaDeposito,c.movimiento,c.observaciones,p.fechaAlta, p.fechaBaja, c.estatus, p.fichaPago, c.archivo, c.estacionamiento_id");
-        $this->db->from("cat_pensiones c");
-        //$this->db->join("pensiones p","c.id_cat_pensiones = p.id_cat_pensiones","left");
-        $this->db->join("pensiones p","c.id_cat_pensiones = p.id_cat_pensiones");
-        $this->db->where("c.id_cat_pensiones",$id_cat_pensiones);
-        $this->db->order_by("p.id_pensiones","ASC");
+
+        //buscamos por contrato y estacionamiento id
+
+        $this->db->distinct();
+        $this->db->select("c.id_cat_pensiones,c.contrato,c.tarjetaSistema,c.tarjetaFisica,c.razonSocial,c.asignado,c.marca,c.modelo,c.color,c.placas,c.tipoPension,c.costo,c.factura,c.pago,c.venta,c.reposicion,c.recargos,c.fechaDeposito,c.movimiento,c.observaciones,p.fechaAlta, c.estatus, p.fichaPago, c.archivo, c.estacionamiento_id");
+        $this->db->from("V_cat_pensiones_gral c");
+        $this->db->join("V_pensiones_gral p","c.id_cat_pensiones = p.id_cat_pensiones","left");
+       // $this->db->join("pensiones p","c.id_cat_pensiones = p.id_cat_pensiones");
+        $this->db->where("c.contrato",$contrato);
+        $this->db->where("c.estacionamiento_id",$estacionamiento);
+        $this->db->where("c.fechaBaja !=''");
+       $this->db->where("c.movimiento= (SELECT MAX(movimiento) FROM V_cat_pensiones_gral d
+        WHERE `d`.`contrato` = '$contrato'
+        AND `d`.`estacionamiento_id` = $estacionamiento
+        AND `d`.`fechaBaja` != '' )");
+                $this->db->order_by("p.id_pensiones","ASC");
+
+       // echo $this->db->get_compiled_select();
+
+        //exit();
+
         
         $result = $this->db->get();
         $data = array();
@@ -484,7 +779,7 @@ class Pensiones_model extends CI_Model{
                     "id_cat_pensiones" => $row["id_cat_pensiones"],
                     "contrato" => $row["contrato"],
                     "fechaAlta" => ($row['fechaAlta'] != '' ? date("Y-m-d", strtotime($row['fechaAlta'])) : ''),
-                    "fechaBaja" => ($row['fechaBaja'] != '' ? date("Y-m-d", strtotime($row['fechaBaja'])) : ''), //date('Y-m-d', strtotime(date('Y-m-06', strtotime('+1 month')))))
+                    "fechaBaja" => "", //date('Y-m-d', strtotime(date('Y-m-06', strtotime('+1 month')))))
                     "tarjetaSistema" => $row["tarjetaSistema"],
                     "tarjetaFisica" => $row["tarjetaFisica"],
                     "razonSocial" => $row["razonSocial"],

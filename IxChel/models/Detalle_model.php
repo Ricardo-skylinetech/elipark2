@@ -312,13 +312,22 @@ class Detalle_model extends CI_Model{
     }
 
     public function getBperdidos($partida_id){
-        $this->db->select('p.id_perdido, c.concepto, SUM(p.cantidad) AS cantidad, t.tarifa, SUM(p.importe) AS importe');
-        $this->db->from('boletos_perdidos p');
-        $this->db->join('cat_boletos_perdidos c', 'c.id = p.id_cat_perdido','left');
-        $this->db->join('cat_tarifas_boletos_perdidos t', 't.id = p.id_cat_tarifa_perdido','left');
+
+
+        $this->db->select('boletos_perdidos.id_perdido,detalle_cajeros.concepto,detalle_cajeros.tarifa,SUM(detalle_cajeros.cantidad) as cantidad,SUM(detalle_cajeros.importe) as importe');
+        $this->db->from('detalle_cajeros ');
+        $this->db->join('boletos_perdidos', 'detalle_cajeros.partida_id = boletos_perdidos.partida_id');
+        $this->db->where("detalle_cajeros.concepto LIKE '%PERDIDO%'");
         $this->db->where('p.partida_id',$partida_id);
-        $this->db->group_by('t.tarifa');
+    
+
+         echo $this->db->get_compiled_select();
+
+        exit();
         $result = $this->db->get();
+
+
+
         $data = $result->result_array('result_array');
 
         //comprobante
