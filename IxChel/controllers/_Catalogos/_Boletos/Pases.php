@@ -6,7 +6,7 @@ class Pases extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('_Catalogos/_Boletos/Recobros_model', 'mRecobros', TRUE);
+        $this->load->model('_Catalogos/_Boletos/Pases_model', 'mPases', TRUE);
         $this->load->model('_Catalogos/Estacionamientos_model', 'mEstacionamientos', TRUE);
         $this->load->library('session');
         $this->load->helper('url');
@@ -22,49 +22,50 @@ class Pases extends CI_Controller
         /* $this->load->view('templates/footer'); */
     }
 
-    public function getCatBrecobros()
+    public function getCatBpases()
     {
+
         $estatus = $this->input->post('estatus');
-        $result = $this->mRecobros->getCatBrecobros($estatus);
+        $result = $this->mPases->getCatBpases($estatus);
         return respuesta_json($result);
     }
 
-    public function getCatTrecobros()
+    public function getCatTPases()
     {
         $estatus = $this->input->post('estatus');
-        $result = $this->mRecobros->getCatTrecobros($estatus);
+        $result = $this->mPases->getCatTPases($estatus);
         return respuesta_json($result);
     }
 
-    public function updateEstatusCatBrecobros()
-    {
-        $id = $this->input->post('id');
-        $estatus = $this->input->post('estatus');
-        $result = $this->mRecobros->updateEstatusCatBrecobros($id,$estatus);
-        return respuesta_json($result);
-    }
-
-    public function updateEstatusCatTrecobros()
+    public function updateEstatusCatBPases()
     {
         $id = $this->input->post('id');
         $estatus = $this->input->post('estatus');
-        $result = $this->mRecobros->updateEstatusCatTrecobros($id,$estatus);
+        $result = $this->mPases->updateEstatusCatBrecobros($id,$estatus);
         return respuesta_json($result);
     }
 
-    public function insertConceptoCatBrecobros()
+    public function updateEstatusCatTPases()
+    {
+        $id = $this->input->post('id');
+        $estatus = $this->input->post('estatus');
+        $result = $this->mPases->updateEstatusCatTrecobros($id,$estatus);
+        return respuesta_json($result);
+    }
+
+    public function insertConceptoCatBPases()
     {
         $concepto = $this->input->post('concepto');
         $estacionamiento = $this->input->post('estacionamiento');
-        $result = $this->mRecobros->insertConceptoCatBrecobros($concepto,$estacionamiento);
+        $result = $this->mPases->insertConceptoCatBrecobros($concepto,$estacionamiento);
         return respuesta_json($result);
     }
 
-    public function insertTarifaCatTrecobros()
+    public function insertTarifaCatTPases()
     {
         $tarifa = $this->input->post('tarifa');
         $estacionamiento = $this->input->post('estacionamiento2');
-        $result = $this->mRecobros->insertTarifaCatTrecobros($tarifa,$estacionamiento);
+        $result = $this->mPases->insertTarifaCatTrecobros($tarifa,$estacionamiento);
         return respuesta_json($result);
     }
 
@@ -73,7 +74,7 @@ class Pases extends CI_Controller
         $id = $this->input->post('idC_e');
         $concepto = $this->input->post('concepto_e');
         $estacionamiento_id = $this->input->post('estacionamiento_idC_e');
-        $result = $this->mRecobros->updateConcepto($id,$concepto,$estacionamiento_id);
+        $result = $this->mPases->updateConcepto($id,$concepto,$estacionamiento_id);
         return respuesta_json($result);
     }
 
@@ -82,7 +83,7 @@ class Pases extends CI_Controller
         $id = $this->input->post('idT_e');
         $tarifa = $this->input->post('tarifa_e');
         $estacionamiento_id = $this->input->post('estacionamiento_idT_e');
-        $result = $this->mRecobros->updateTarifa($id,$tarifa,$estacionamiento_id);
+        $result = $this->mPases->updateTarifa($id,$tarifa,$estacionamiento_id);
         return respuesta_json($result);
     }
 }

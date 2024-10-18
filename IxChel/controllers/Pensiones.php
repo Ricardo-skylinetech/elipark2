@@ -70,6 +70,7 @@ class Pensiones extends CI_Controller
         $todo="";
         $activas="";
         $inactivas="";
+        $filtroFoto=0;
 
         foreach ($data as $item) {
             if ($item['name'] == 'estacionamiento') {
@@ -84,15 +85,19 @@ class Pensiones extends CI_Controller
                 $fechaMes = $item['value'];
             }elseif ($item['name'] == 'inactivas') {
                 $inactivas = $item['value'];
-            } 
+            }
+            elseif ($item['name'] == 'filtroFoto') {
+                $filtroFoto = $item['value'];
+            }
+
             else {
                 $select = $item['value'];
             }
         }
      
-
+   
         $estacionamiento = ($parking !== "" ? $parking : $this->session->userdata('id_estacionamiento'));
-        $result = $this->mPensiones->getPensiones($select,$estacionamiento,$todo,$activas,$inactivas,$fechaMes);
+        $result = $this->mPensiones->getPensiones($select,$estacionamiento,$todo,$activas,$inactivas,$fechaMes,$filtroFoto);
         return respuesta_json($result);
     }
 
@@ -178,7 +183,7 @@ class Pensiones extends CI_Controller
     {
         $id_cat_pensiones = $this->input->post('id_cat_pensiones');
         $contrato = $this->input->post('contrato');
-
+        $fechaDoc=$this->input->post('fechaAltaDoc');
 
         try {
             $result = array();
@@ -198,7 +203,8 @@ class Pensiones extends CI_Controller
                 $nombre_archivo = $contrato . "_" . date('Y-m-d') . "_" . date('His').".pdf";
                 // var_dump($nombre_archivo);
                 if (move_uploaded_file($_FILES['file2']['tmp_name'], $rutaDestino . $nombre_archivo)) {
-                    $result = $this->mPensiones->guardarFicha($id_cat_pensiones, $nombre_archivo);
+                    $result = $this->mPensiones->guardarFicha($id_cat_pensiones, $nombre_archivo,$fechaDoc);
+
                     return respuesta_json($result);
                 } else {
                     $result['validacion'] = false;
@@ -364,11 +370,23 @@ class Pensiones extends CI_Controller
     public function extraerHistorico()
     {
         $id = $this->input->post('id');
-        $result = $this->mPensiones->extraerHistorico($id);
+        $contrato= $this->input->post('contrato');
+        $estacionamiento=$this->input->post('estacionamiento');
+        $result = $this->mPensiones->extraerHistorico($id,$contrato,$estacionamiento);
         return respuesta_json($result);
     }
 
+
+
+
+
+
+
     public function sensarpensiones(){
+
+        date_default_timezone_set("America/Chihuahua");
+
+     
 
         $this->db->select(
                         "curdate() as Hoy,
@@ -381,25 +399,214 @@ class Pensiones extends CI_Controller
         $query = $this->db->get();
         $result=$query->result_array();
 
-        if($result[0]['bandera']==1){
 
-            //desactivamos las pensiones no se afectan los primeros 5 días del mes inicial
-              $this->db->update('pensiones', array("estatus" => 0, "fechaBaja"=>date("Y-m-d")), "fechaAlta < curdate() - INTERVAL 5 DAY");
-              $this->db->update('cat_pensiones', array("estatus" => 0,"fechaBaja"=>date("Y-m-d")), "fechaAlta < curdate() - INTERVAL 5 DAY");
+        //consultamos bandera de disparo
 
+        $banderaR= $this->db->query("SELECT bandera FROM pensiones_estatus_inactivas_6 where id=1");
+        $ok=$banderaR->result_array();
+
+     
+        if($result[0]['bandera']==1 && $ok[0]['bandera']==0){
+
+
+                $result= $this->db->query("SELECT count(*) as total FROM cat_pensiones_foto_mes WHERE fechaAlta < curdate() - INTERVAL 5 DAY");
+                $total=$result->result_array();
+
+          //print_r($total[0]['total']); 
+
+
+                  if($total[0]['total']==0){
+
+                  //  echo "clonamos toda la tabla pensiones antes de realizar el update de inactivas";
+
+                     $this->db->query("INSERT INTO cat_pensiones_foto_mes SELECT * from cat_pensiones WHERE fechaAlta < curdate() - INTERVAL 5 DAY");
+                     $this->db->query("INSERT INTO pensiones_foto_mes SELECT * from pensiones WHERE fechaAlta < curdate() - INTERVAL 5 DAY");
+
+                  }
+                 else{
+
+
+                      //consultamos tabla cat_pensiones id por id si no existe en tabla cat_foto lo insertamos, una vez insertado todo validamos de nuevo si total = total
+
+                       $ValidaCat= $this->db->query("SELECT id_cat_pensiones FROM cat_pensiones WHERE fechaAlta < curdate() - INTERVAL 5 DAY");
+                       $totalCat=$ValidaCat->result_array();
+
+                       $this->db->query("UPDATE pensiones_foto_mes SET bandera=1 WHERE fechaAlta < curdate() - INTERVAL 5 DAY");
+
+                       $fecha=date('Y-m-d');
+
+                       
+
+                       $this->db->query("UPDATE pensiones_foto_mes SET fechaBaja='$fecha' WHERE fechaAlta < curdate() - INTERVAL 5 DAY");
+
+                       $this->db->query("UPDATE cat_pensiones_foto_mes SET fechaBaja='$fecha' WHERE fechaAlta < curdate() - INTERVAL 5 DAY");
+
+
+                          foreach ($ValidaCat->result_array() as $row) {
+
+                                $id_cat_pensiones=$row["id_cat_pensiones"];
+                                $resultCatValida= $this->db->query("SELECT * FROM cat_pensiones_foto_mes WHERE id_cat_pensiones=$id_cat_pensiones");
+                                $totalCatOK=$resultCatValida->result_array();
+
+                                //update bandera a 1 para inactivarlas
+
+
+
+                                //echo count($totalCatOK);
+                                if(count($totalCatOK)==0 ){
+
+                                  // echo $id_cat_pensiones." no existe lo insertamos";
+
+                                    //clonamos el id en foto_mes
+                                    $this->db->query("INSERT INTO cat_pensiones_foto_mes SELECT * from cat_pensiones WHERE id_cat_pensiones=$id_cat_pensiones");
+                                    $this->db->query("INSERT INTO pensiones_foto_mes SELECT * from  pensiones WHERE id_cat_pensiones=$id_cat_pensiones");
+
+                                }
+
+
+                            }
+
+
+                       //print_r($ValidaCat);
+
+                     //  exit();
+
+
+
+
+                       $resultCat= $this->db->query("SELECT count(*) as total FROM cat_pensiones_foto_mes WHERE fechaAlta < curdate() - INTERVAL 5 DAY");
+                       $totalCatP=$resultCat->result_array();
+
+                    //echo $totalCatP[0]['total'];
+
+                    //echo count($totalCat);
+
+
+                      // echo "entramos a validar si cat_pensiones_foto_mes  == cat_pensiones";
+
+                     //  echo count($totalCatP[0]['total']);
+
+                     if(count($totalCat)==$totalCatP[0]['total']){
+
+                       // echo "entramos a desactivar y ponerlas a todas en fecha de alta a fecha actual";
+
+                        //desactivamos las pensiones no se afectan los primeros 5 días del mes inicial
+                        $this->db->update('pensiones', array("estatus" => 0, "bandera" =>0, "fechaAlta" =>date('Y-m-d')), "fechaAlta < curdate() - INTERVAL 5 DAY");
+                         $this->db->update('cat_pensiones', array("estatus" => 0, "fechaAlta" =>date('Y-m-d')), "fechaAlta < curdate() - INTERVAL 5 DAY");
+
+
+                         $this->db->query("UPDATE pensiones_estatus_inactivas_6 SET bandera=1 where id=1");
+                         //ponermos bandera de status de ejecion en 1 para que ya no vuelva a entrar
+
+
+                     }
+                 }
+
+               
               $response=new stdClass();
               $response->valida="Se han actualizado las pensiones a inactivas";
   
         }else{
 
+     
+            //actualizamos bandera a 0
+              $this->db->query("UPDATE pensiones_estatus_inactivas_6 SET bandera=0 where id=1");
               $response=new stdClass();
               $response->valida="todo bien, proxima fecha de inactivacion : ".$result[0]['proxInactivar'];
          
         }
+
+
+
         echo json_encode($response);
 
     }
 
+
+public function sensarpensionesv2(){
+
+        //validamos si estamos en día 6
+
+         $this->db->select(
+                        "curdate() as Hoy,
+                        ADDDATE(SUBDATE(curdate(), DAYOFMONTH(curdate()) - 1), INTERVAL 5 DAY) as proxInactivar,
+                        (CASE
+                        WHEN curdate() = ADDDATE(SUBDATE(curdate(), DAYOFMONTH(curdate()) - 1), INTERVAL 5 DAY) THEN 1
+                        ELSE 0
+                        END) as bandera") ;
+
+        $query = $this->db->get();
+        $result=$query->result_array();
+
+
+        $banderaR= $this->db->query("SELECT bandera FROM pensiones_estatus_inactivas_6 where id=1");
+        $ok=$banderaR->result_array();
+
+     
+        if($result[0]['bandera']==1 && $ok[0]['bandera']==0){
+
+            //entramos al proceso para consultar las pensiones 
+
+              $pensiones= $this->db->query("SELECT id_cat_pensiones,fechaAlta,estatus, tipoPension FROM cat_pensiones WHERE fechaAlta < curdate() - INTERVAL 5 DAY AND tipoPension !='CORTESIA'");
+              $resultPensiones=$pensiones->result_array();
+
+              //recorremos todas las pensiones y validamos si existen en tabla de foto validar id de pensión y fecha de alta
+                        foreach ($resultPensiones as $row) {
+
+                                    $id_cat_pensiones=$row["id_cat_pensiones"];
+                                    $fechaPension=$row["fechaAlta"];
+                                    $estatus=$row["estatus"];
+
+                                    //consultamos en tabla de fotos
+                               $resultCatValida= $this->db->query("SELECT * FROM cat_pensiones_foto_mes WHERE id_cat_pensiones=$id_cat_pensiones");
+                                $totalCatOK=$resultCatValida->result_array();
+
+
+                               // echo count($totalCatOK);
+
+                                if($totalCatOK>0){
+
+                                 $this->db->update('cat_pensiones_foto_mes', array("estatus" =>$estatus),  array("id_cat_pensiones"=>$id_cat_pensiones));
+
+
+                                }else{
+
+                                        $this->db->query("INSERT INTO cat_pensiones_foto_mes SELECT * from cat_pensiones WHERE id_cat_pensiones=$id_cat_pensiones");
+                                
+                                        $this->db->query("INSERT INTO pensiones_foto_mes SELECT * from  pensiones WHERE id_cat_pensiones=$id_cat_pensiones");
+
+                                        $this->db->query("UPDATE pensiones_foto_mes SET bandera=1 WHERE id_cat_pensiones=$id_cat_pensiones");
+
+
+                                }
+
+            
+            //actualizamos fecha de baja y fecha de alta vacia en pensiones y cat_pensiones, status 0 para dejarla como nueva
+            $this->db->update('pensiones', array("estatus" => 0, "bandera" =>0, "fechaAlta" =>'',"fechaBaja" =>date('Y-m-d')),  array("id_cat_pensiones"=>$id_cat_pensiones));
+            $this->db->update('cat_pensiones', array("estatus" => 0, "fechaAlta" =>'',"fechaBaja" =>date('Y-m-d')),  array("id_cat_pensiones"=>$id_cat_pensiones));
+
+
+            }
+
+             $this->db->query("UPDATE pensiones_estatus_inactivas_6 SET bandera=0 where id=1");
+             $response=new stdClass();
+             $response->valida="Se han actualizado las pensiones";
+             
+
+        }else{
+
+              $response=new stdClass();
+              $response->valida="todo bien, proxima fecha de inactivacion : ".$result[0]['proxInactivar'];
+        }
+
+
+       echo json_encode($response);
+
+
+    }//fin de sensor
+
+
+    
 
 
 }

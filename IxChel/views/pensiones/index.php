@@ -156,6 +156,18 @@ window.addEventListener('DOMContentLoaded', function() {
                             </div>
                            
                         </div>
+                             <div class="row">
+                            <div class="col-sm-10">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="filtroFoto" value="1" name="filtroFoto">
+                                    <label class="form-check-label" for="mes">Filtro Foto</label>
+                                </div>
+                            </div>
+                     
+                           
+                        </div>
+
+
                       </div>
                   </div>
               </form>
@@ -474,6 +486,7 @@ window.addEventListener('DOMContentLoaded', function() {
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+            <input type="hidden" name="banderaEdit" id="banderaEdit">
             <form id="frm-editar" method="POST">
                 <div class="modal-body">
                     <div class="card shadow mb-4">
@@ -779,6 +792,11 @@ window.addEventListener('DOMContentLoaded', function() {
                                         <input id="id_cat_pensiones" type="text" class="form-control" name="id_cat_pensiones" hidden>
                                         <input id="contrato" type="text" class="form-control" name="contrato" hidden>
                                         <div class="mb-4">
+                                             <label for="n-fechaAlta" class="col-sm-2 col-form-label font-weight-bold">Fecha Alta:</label>
+                                                <div class="col-sm-3">
+                                                    <input type="date" class="form-control" id="fechaAltaDoc" name="fechaAltaDoc" required >
+                                                </div>
+
                                             <label for="file2">&nbsp;</label>
                                             <div class="file-drop-area">
                                                 <input type="file" id="file2" name="file2" class="file-input" /*onchange="handleFileSelect2(event)"*/ accept=".pdf" required>
@@ -1086,7 +1104,13 @@ window.addEventListener('DOMContentLoaded', function() {
                     {
                         "defaultContent": "","width":"2%",
                         "render": function(data, type, full, meta) {
-                            if(full.fichaPago == null){
+
+                            if(full.fichaPago == 0){
+                                return `<div><button class='subirFichab' data-toggle="tooltip" data-placement="top" title="Subir ficha de pago"><i class="fa fa-lock"></i></button></div>`;
+                            }
+
+
+                            else if(full.fichaPago == null){
                                 return `<div><button class='subirFicha' data-toggle="tooltip" data-placement="top" title="Subir ficha de pago"><i class="fas fa-upload"></i></button></div>`;
                             } else {
                                 return `<button class='verFicha' onclick="window.open('../detalle/viewFile/pensiones/` + full.contrato + `/` + full.fichaPago + `','name','width=1000,height=600')" target='_blank' data-toggle="tooltip" data-placement="top" title="Ficha"><i class="far fa-file-pdf fa-lg"></i></button>`;
@@ -1096,7 +1120,16 @@ window.addEventListener('DOMContentLoaded', function() {
                     {
                         "defaultContent": "","width":"2%",
                         "render": function(data, type, full, meta) {
-                            return `<div><button class='verDetalle' data-toggle="tooltip" data-placement="top" title="Detalle"><i class="fas fa-eye"></i></button></div>`;
+
+
+
+                             return `<div><button class='verDetalle' data-toggle="tooltip" data-placement="top" title="Detalle"><i class="fas fa-eye"></i></button></div>`;
+                                
+
+
+                           
+
+
                         }
                     },
                     {
@@ -1135,6 +1168,15 @@ window.addEventListener('DOMContentLoaded', function() {
                     $("#tblPensiones tbody").on("click", ".verDetalle", function () {
                         let data = table.row($(this).parents("tr")).data();
                         let id = data.id_cat_pensiones;
+                      // alert(data.fichaPago);
+                       $("#banderaEdit").val(0);
+
+                        if(data.fichaPago==0){
+
+                          $("#banderaEdit").val(1);
+                        }
+
+
                         $.post("extraerDetalle", {id:id},
                         function(result){
 
@@ -1163,6 +1205,20 @@ window.addEventListener('DOMContentLoaded', function() {
                         let data = table.row($(this).parents("tr")).data();
             
                         let id = data.id_cat_pensiones;
+                        let fechaAlta=data.fechaAlta;
+
+                        var obtieneFecha=fechaAlta.split('-');
+
+                        var anio=obtieneFecha[0];
+                        var mes=obtieneFecha[1];
+                        var dia=obtieneFecha[2];
+
+                        var fechaArmada=dia+"-"+mes+"-"+anio;
+
+                      
+                        $("#fechaAltaDoc").val(fechaArmada);
+
+                       //alert(fechaAlta);
                         let contrato = data.contrato;
                         $("#contrato").val(contrato);
                         $("#id_cat_pensiones").val(id);
@@ -1173,7 +1229,12 @@ window.addEventListener('DOMContentLoaded', function() {
                     $("#tblPensiones tbody").on("click", ".verHistorico", function () {
                         let data = table.row($(this).parents("tr")).data();
                         let id = data.id_cat_pensiones;
-                        fn_tblHistorico(id);
+                      //  alert(data.contrato);
+                        var estacionamiento=$("#estacionamiento").val();
+
+                      
+
+                        fn_tblHistorico(id,data.contrato,estacionamiento);
                         $("#modalHistorico").modal('show');
                     });
                 },
@@ -1233,7 +1294,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
         }
 
-        function fn_tblHistorico(id) {
+        function fn_tblHistorico(id,contrato,estacionamiento) {
             tblHistorico = $('#tblHistorico').DataTable({
                 destroy: true,
                 dom: 'Bfrtip',
@@ -1247,7 +1308,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 "ajax": {
                     type: "POST",
                     url: "extraerHistorico",
-                    data: {id:id}
+                    data: {id:id,contrato:contrato,estacionamiento:estacionamiento}
                 },
                 "columns": [
                     {"data":"id_cat_pensiones"},
@@ -1659,10 +1720,28 @@ window.addEventListener('DOMContentLoaded', function() {
         });
 
         $("#btn-editar").click(function(){
+
+            var band=$("#banderaEdit").val();
+
+            if(band==1){
+                $("#e-estatus").prop('disabled', false);
+                $("#e-tipoPension").prop("disabled",true);
+                $("#e-costo").prop("disabled",true);
+                $("#e-factura").prop("disabled",true);
+                $("#e-pago").prop("disabled",true);
+                $("#e-venta").prop("disabled",true);
+                $("#e-reposicion").prop("disabled",true);
+
+
+            }else{
             $("#frm-editar input").removeAttr("readonly");
             $("#frm-editar textarea").removeAttr("readonly");
             $("#e-estatus").prop('disabled', false);
+             }
+
             $("#btn-editar").hide();
+
+
             $("#btn-guardar").show();
         });
 
