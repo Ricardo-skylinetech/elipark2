@@ -7,10 +7,11 @@
                 <th>Fecha</th>
                 <th>Dia</th>
                 <th>Boletos generado fisicos</th>
+                <th>PASE</th>
                 <th>Creación vouchers y prepagos</th>
                 <th>Boletos expedidos fisicos y rotación</th>
                 <th>Boletos cobrados</th>
-                <th>Boleto cobrado</th>
+                <th>%Boleto cobrado</th>
                 <th>Boletos sin cobro</th>
                 <th>Boletos recuperados</th>
                 <th>Diferencia</th>
@@ -34,10 +35,11 @@
                 <th>Fecha</th>
                 <th>Dia</th>
                 <th>Boletos generado fisicos</th>
+                <th>PASE</th>
                 <th>Creación vouchers y prepagos</th>
                 <th>Boletos expedidos fisicos y rotación</th>
                 <th>Boletos cobrados</th>
-                <th>Boleto cobrado</th>
+                <th>%Boleto cobrado</th>
                 <th>Boletos sin cobro</th>
                 <th>Boletos recuperados</th>
                 <th>Diferencia</th>

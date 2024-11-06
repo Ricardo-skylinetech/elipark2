@@ -246,10 +246,37 @@ class Panel extends CI_Controller
             for ($i = 0; $i < count($cat_boletos_info_prepago); $i++) {
                 $worksheet2->setCellValue("BZ" . $fila_inicio, $cat_boletos_info_prepago[$i]["id"]);
                 $worksheet2->setCellValue("BY" . $fila_inicio, $cat_boletos_info_prepago[$i]["concepto"]);
-                $worksheet2->setCellValue("CA" . $fila_inicio, $cat_boletos_info_prepago[$i]["estatus"]);
+                $worksheet2->setCellValue("CA" . $fila_inicio, $cat_boletos_info_prepago[$i]["estatus"]); //$cat_boletos_info_prepago[$i]["estatus"]
                 $worksheet1->setCellValue("DC" . $fila_inicio, $cat_boletos_info_prepago[$i]["concepto"]);
                 $fila_inicio++;
             }
+
+            $fila_inicio = 5;
+            $cat_boletos_pases = $this->mPanel->getCatalogos("cat_boletos_pases", $estacionamiento);
+          
+
+            for ($i = 0; $i < count($cat_boletos_pases); $i++) {
+
+               // echo $cat_boletos_pases[$i]["concepto"];
+                $worksheet2->setCellValue("CD" . $fila_inicio, $cat_boletos_pases[$i]["id"]);
+                $worksheet2->setCellValue("CC" . $fila_inicio, $cat_boletos_pases[$i]["concepto"]);
+                $worksheet2->setCellValue("CE" . $fila_inicio, $cat_boletos_pases[$i]["estatus"]);
+                $worksheet1->setCellValue("CB" . $fila_inicio, $cat_boletos_pases[$i]["concepto"]);
+                $fila_inicio++;
+            }
+
+            $fila_inicio = 5;
+            $cat_tarifa_pases = $this->mPanel->getCatalogos("cat_tarifas_boletos_pases", $estacionamiento);
+            for ($i = 0; $i < count($cat_tarifa_recobros); $i++) {
+                $worksheet2->setCellValue("CH" . $fila_inicio, $cat_tarifa_pases[$i]["id"]);
+                $worksheet2->setCellValue("CG" . $fila_inicio, $cat_tarifa_pases[$i]["tarifa"]);
+                $worksheet2->setCellValue("CI" . $fila_inicio, $cat_tarifa_pases[$i]["estatus"]);
+                $worksheet1->setCellValue("CG" . $fila_inicio, $cat_tarifa_pases[$i]["tarifa"]);
+                $fila_inicio++;
+            }
+
+
+
         } catch (Exception $e) {
             return respuesta_json(['success' => FALSE, 'msg' => $e->getTraceAsString()]);
         } finally {
@@ -567,10 +594,11 @@ class Panel extends CI_Controller
             for ($fila = 5; $fila < $total_registros; $fila++) { //fila
                 if ($sheetData[$fila]["BY"] !== "ERROR" && $sheetData[$fila]["BY"] !== "FALSO" && $sheetData[$fila]["BY"] !== "" && $sheetData[$fila]["BY"] !== NULL) {
                     // if ((int)$sheetData[$fila]["CA"] != 0 && (int)$sheetData[$fila]["CA"] !== "") {
+                    
                     $insertPerdidos[] = array(
                         "id_cat_perdido" => (int)$sheetData[$fila]["BY"],
                         // "concepto" => $sheetData[$fila]["BZ"],
-                        "cantidad" => (int)$sheetData[$fila]["CA"],
+                        "cantidad" =>(int)$sheetData[$fila]["CA"],
                         "id_cat_tarifa_perdido" => (int)$sheetData[$fila]["CB"],
                         // "tarifa" => (int)$sheetData[$fila]["CC"],
                         "importe" => (int)$sheetData[$fila]["CD"],
@@ -579,10 +607,12 @@ class Panel extends CI_Controller
                         "creado_por" => $this->session->userdata('id_usuario'),
                         "partida_id" => $maxID
                     );
+
+                   // print_r($insertPerdidos);
                     // }
                 }
             }
-            // $this->mPanel->guardarLayot("boletos_perdidos", $insertPerdidos);
+             //$this->mPanel->guardarLayot("boletos_perdidos", $insertPerdidos);
 
             ///////////////////////////// BOLETOS PREPAGO /////////////////////////////
             $insertPrepago = array();
@@ -1249,6 +1279,7 @@ class Panel extends CI_Controller
     public function viewFile($carpeta, $partida_id, $ruta) {
         // Datos de conexión FTP
         $ftp_server = 'ftp.skylinetech.com.mx';
+        
         $ftp_username = 'skylinetech@skylinetech.com.mx';
         $ftp_password = 'Skyl1n3-2024@';
     

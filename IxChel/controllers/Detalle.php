@@ -68,6 +68,14 @@ class Detalle extends CI_Controller
         return respuesta_json($result);
     }
 
+    public function getPases()
+    {
+        $partida_id = $this->input->post('id');
+        $result = $this->mDetalle->getBPases($partida_id);
+        return respuesta_json($result);
+    }
+
+
     public function getBvalet()
     {
         $partida_id = $this->input->post('id');
