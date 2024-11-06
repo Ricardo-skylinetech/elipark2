@@ -32,7 +32,8 @@ foreach ($result->result_array() as $row) {
             "cedula" => $row['cedula'],
             "auditor" => $row['auditor'],
             "gerente" => $row['gerente'],
-            "limiteBolDif" => $row['limiteBolDif']
+            "limiteBolDif" => $row['limiteBolDif'],
+            "bPases"=>$row['bPases']
         );
     }
 }

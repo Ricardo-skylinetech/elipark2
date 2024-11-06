@@ -151,6 +151,30 @@ class Detalle_model extends CI_Model{
         return $response;
     }
 
+      public function getBPases($partida_id){
+        $this->db->select('b.id_pases, c.concepto, b.cantidad, t.tarifa, b.importe');
+        $this->db->from('boletos_pases b');
+        $this->db->join('cat_boletos_pases c', 'c.id = b.id_cat_pases','left');
+        $this->db->join('cat_tarifas_boletos_pases t', 't.id = b.id_cat_tarifa_pases','left');
+        $this->db->where('b.partida_id',$partida_id);
+        $result = $this->db->get();
+        $data = $result->result_array('result_array');
+
+        //comprobante
+        $this->db->select('*');
+        $this->db->from('boletos_comprobantes');
+        $this->db->where('partida_id',$partida_id);
+        $this->db->where('tipoComprobante','boletos_pases');
+        $comprobante = $this->db->get();
+        $ruta = $comprobante->result_array('result_array');
+
+        $response = array("validacion" => ($result->num_rows() > 0 ? true : false), "data" => ($result->num_rows() > 0 ? $data : []), "comprobante"=> ($comprobante->num_rows() > 0 ? $ruta : false));
+        return $response;
+    }
+
+
+
+
     public function getBvalet($partida_id){
         $this->db->select();
         $this->db->from('boletos_valet');
@@ -318,12 +342,11 @@ class Detalle_model extends CI_Model{
         $this->db->from('detalle_cajeros ');
         $this->db->join('boletos_perdidos', 'detalle_cajeros.partida_id = boletos_perdidos.partida_id');
         $this->db->where("detalle_cajeros.concepto LIKE '%PERDIDO%'");
-        $this->db->where('p.partida_id',$partida_id);
+        $this->db->where('boletos_perdidos.partida_id',$partida_id);
     
 
-         echo $this->db->get_compiled_select();
+       // $this->db->get_compiled_select();
 
-        exit();
         $result = $this->db->get();
 
 

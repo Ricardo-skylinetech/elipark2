@@ -460,6 +460,45 @@
                                 </div>
                             </div>
 
+
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">PASE</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm" id="tbl_pases" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Id</th>
+                                                    <th>Concepto</th>
+                                                    <th>Cantidad</th>
+                                                    <th>Tarifa</th>
+                                                    <th>Importe</th>
+                                                </tr>
+                                            </thead>
+                                            <tfoot>
+                                                <tr>
+                                                    <th></th>
+                                                    <th></th>
+                                                    <th>Cantidad</th>
+                                                    <th></th>
+                                                    <th>Importe</th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+
+
+
+
+
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary">PENSIONES</h6>
@@ -1020,13 +1059,13 @@
                                                 $('row:first c t', sheet).text('Boletos Fisicos');
                                             }
                                         },
-                                        {
+                                        /*{
                                             text: '<i class="fas fa-file-upload fa-lg"></i>',
                                             titleAttr: 'Subir',
                                             attr:{
                                                 id : 'comprobanteFisicos'
                                             }
-                                        }
+                                        }*/
                                     ],
                                     "ajax": {
                                         url: "../../detalle/getBfisicos",
@@ -1576,6 +1615,8 @@
                                             $("#comprobanteRecobros").replaceWith(`<button class="dt-button verComprobante" onclick="window.open('../../detalle/viewFile/boletos_recobros/`+partida_id+`/`+ruta+`','name','width=1000,height=600')" target="_blank" data-toggle="tooltip" data-placement="top" title="Ver Comprobante"><span><i class="fas fa-eye fa-lg"></i></span></button>`);
                                         }
                                         fn_tbl_bValet(partida_id);
+
+                                        fn_tbl_bPases(partida_id);
                                         $("#comprobanteRecobros").on("click", function() {
                                             $("#tipoComprobante").val("boletos_recobros");
                                             $("#comprobanteTipo").html("Comprobante Boletos Recobros");
@@ -1631,6 +1672,144 @@
                                     "ordering": false,
                                 });
                             }
+
+
+
+
+                               fn_tbl_bPases = function(partida_id){
+
+                               
+                                let tbl_recobros = $('#tbl_pases').DataTable({
+                                    destroy: true,
+                                    dom: 'Bfrtip',
+                                    buttons: [
+                                        {
+                                            extend:    'excelHtml5',
+                                            text:      '<i class="fas fa-file-excel fa-lg"></i>',
+                                            titleAttr: 'Excel',
+                                        exportOptions: {
+                                            columns: ':gt(0)' // Selecciona todas las columnas excepto la primera
+                                        },
+                                        customize: function(xlsx) {
+                                            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                            
+                                            // Modificar estilo de la primera fila (título)
+                                            $('row:first c', sheet).attr('s', '42');
+                                            $('row:first c', sheet).attr('s', '55');
+                                            
+                                            // Centrar el texto del título
+                                            $('row:first c', sheet).each(function() {
+                                                $('c[r="A1"]', sheet).attr('s', '2');
+                                            });
+                                            
+                                            // Cambiar el color de fondo del título
+                                            $('row:first c', sheet).each(function() {
+                                                $(this).attr('s', '5');
+                                            });
+                                            
+                                            // Añadir el texto del título
+                                            $('row:first c t', sheet).text('Recobros');
+                                        }
+                                        },
+                                        {
+                                            text: '<i class="fas fa-file-upload fa-lg"></i>',
+                                            titleAttr: 'Subir',
+                                            attr:{
+                                                id : 'comprobantePase'
+                                            }
+                                        }
+                                    ],
+                                    "ajax": {
+                                        type: "POST",
+                                        url: "../../detalle/getPases",
+                                        dataType: "json",
+                                        data: {id:partida_id}
+                                    },
+                                    "columns": [
+                                        {"data": "id_pases"},
+                                        {"data": "concepto"},
+                                        {"data": "cantidad",render: $.fn.dataTable.render.number(',', '.', 0, '')},
+                                        {"data": "tarifa",render: $.fn.dataTable.render.number(',', '.', 2, '$')},
+                                        {"data": "importe",render: $.fn.dataTable.render.number(',', '.', 2, '$')}
+                                    ],
+                                    "columnDefs": [
+                                        {
+                                            "targets": [0],
+                                            "visible": false,
+                                            "searchable": true
+                                        },
+                                        { width: '5%', targets: 0 },
+                                        {
+                                            className: "dt-body-right", targets: [ 2,3,4 ]
+                                        }
+                                    ],
+                                    initComplete: function (settings, json) {
+                                        if(json.comprobante != false){
+                                            var ruta = json.comprobante[0].ruta;
+                                            $("#comprobanteRecobros").replaceWith(`<button class="dt-button verComprobante" onclick="window.open('../../detalle/viewFile/boletos_recobros/`+partida_id+`/`+ruta+`','name','width=1000,height=600')" target="_blank" data-toggle="tooltip" data-placement="top" title="Ver Comprobante"><span><i class="fas fa-eye fa-lg"></i></span></button>`);
+                                        }
+                                        fn_tbl_bValet(partida_id);
+                                        $("#comprobanteRecobros").on("click", function() {
+                                            $("#tipoComprobante").val("boletos_recobros");
+                                            $("#comprobanteTipo").html("Comprobante Boletos Recobros");
+                                            $("#modalComprobantes").modal('show');
+                                        });
+                                    },
+                                    footerCallback: function (row, data, start, end, display) {
+                                        var api = this.api();
+                            
+                                        // Remove the formatting to get integer data for summation
+                                        var intVal = function (i) {
+                                            return typeof i === 'string' ? i.replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                                        };
+                            
+                                        // Total over all pages
+                                        totalCantidad = api
+                                            .column(2)
+                                            .data()
+                                            .reduce(function (a, b) {
+                                                return intVal(a) + intVal(b);
+                                            }, 0);
+
+                                        totalImporte = api
+                                            .column(4)
+                                            .data()
+                                            .reduce(function (a, b) {
+                                                return intVal(a) + intVal(b);
+                                            }, 0);
+                            
+                                        // Total over this page
+                                        // pageTotal = api
+                                        //     .column(4, { page: 'current' })
+                                        //     .data()
+                                        //     .reduce(function (a, b) {
+                                        //         return intVal(a) + intVal(b);
+                                        //     }, 0);
+                            
+                                        // Update footer
+                                        $(api.column(1).footer()).html("Total");
+                                        $(api.column(2).footer()).html(formatNumber(totalCantidad));
+                                        $(api.column(4).footer()).html('$&nbsp;'+formatNumber(totalImporte,2));
+                                    },
+                                    "language": {
+                                        "url": "<?= base_url();?>public/vendor/datatables/language/spanish.json"
+                                    },
+                                    "info": true,
+                                    "scrollY": '52vh',
+                                    "scrollX" : true,
+                                    "scrollCollapse": false,
+                                    "paging": true,
+                                    "pageLength": 25,
+                                    "searching": true,
+                                    "ordering": false,
+                                });
+                            }
+
+
+
+
+
+
 
                             fn_tbl_bValet = function(partida_id){
                                 let tbl_bValet = $('#tbl_bValet').DataTable({

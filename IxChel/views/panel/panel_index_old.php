@@ -987,7 +987,7 @@
                         "render": function(data, type, full, meta) {
                             var number = parseFloat(data);
                             if (!isNaN(number)) {
-                                return formatNumber(number, 2)+"&nbsp%";
+                                return formatNumber(number, 2)+"&nbsp;";
                             }
                             return data;
                         }
@@ -1240,28 +1240,22 @@
                         return intVal(a) + intVal(b);
                     }, 0);
 
-                    bPases = api.column(5).data().reduce(function(a, b) {
+
+
+
+                    voucherYprep = api.column(5).data().reduce(function(a, b) {
                         return intVal(a) + intVal(b);
                     }, 0);
 
-
-                    voucherYprep = api.column(6).data().reduce(function(a, b) {
+                    bExpFisYrot = api.column(6).data().reduce(function(a, b) {
                         return intVal(a) + intVal(b);
                     }, 0);
 
-
-
-                    bExpFisYrot = api.column(7).data().reduce(function(a, b) {
+                    boletosCobrados = api.column(7).data().reduce(function(a, b) {
                         return intVal(a) + intVal(b);
                     }, 0);
 
-
-
-                    boletosCobrados = api.column(8).data().reduce(function(a, b) {
-                        return intVal(a) + intVal(b);
-                    }, 0);
-
-                    var porcentajeCobrado = table.column(9).data().toArray();
+                    var porcentajeCobrado = table.column(8).data().toArray();
                     porcentajeCobrado = porcentajeCobrado.map(function(val) {
                         if (val !== null) {
                             val = val.replace('%', '');
@@ -1271,21 +1265,19 @@
                     });
                     var porcentajeCobrado = calcularPromedio(porcentajeCobrado);
 
-                    boletosSinCobro = api.column(10).data().reduce(function(a, b) {
+                    boletosSinCobro = api.column(9).data().reduce(function(a, b) {
                         return intVal(a) + intVal(b);
                     }, 0);
 
-                    boletosRegresados = api.column(11).data().reduce(function(a, b) {
+                    boletosRegresados = api.column(10).data().reduce(function(a, b) {
                         return intVal(a) + intVal(b);
                     }, 0);
 
-
-                    diferencia = api.column(12).data().reduce(function(a, b) {
+                    diferencia = api.column(11).data().reduce(function(a, b) {
                         return intVal(a) + intVal(b);
                     }, 0);
 
-                 
-                    var boletoPromedio = table.column(13).data().toArray();
+                    var boletoPromedio = table.column(12).data().toArray();
                     boletoPromedio = boletoPromedio.map(function(val) {
                         if (val !== null) {
                             val = val.replace('%', '');
@@ -1293,42 +1285,28 @@
                         }
                         return 0; // Otra opción es tratar los valores nulos como 0
                     });
-
-
-
                     var promedioPorcentaje = calcularPromedio(boletoPromedio);
 
 
-
-                    bolPerdido = api.column(14).data().reduce(function(a, b) {
+                    bolPerdido = api.column(13).data().reduce(function(a, b) {
                         return intVal(a) + intVal(b);
                     }, 0);
 
-
-
-                    ingresoBoletaje = api.column(15).data().reduce(function(a, b) {
+                    ingresoBoletaje = api.column(14).data().reduce(function(a, b) {
                         return intVal(a) + intVal(b);
                     }, 0);
 
-
-
-                    ingresoPensiones =api.column(16).data().reduce(function(a, b) {
+                    ingresoPensiones =api.column(15).data().reduce(function(a, b) {
                         return intVal(a) + intVal(b);
                     }, 0);
 
-
-
-                    ingresoOtros = api.column(18).data().reduce(function(a, b) {
+                    ingresoOtros = api.column(17).data().reduce(function(a, b) {
                         return intVal(a) + intVal(b);
                     }, 0);
 
-                  
-                    ingresoGeneral = api.column(19).data().reduce(function(a, b) {
+                    ingresoGeneral = api.column(18).data().reduce(function(a, b) {
                         return intVal(a) + intVal(b);
                     }, 0);
-
-
-                    
 
                     // Total over this page
                     // pageTotal = api
@@ -1339,42 +1317,35 @@
                     //     }, 0);
 
                     // Update footer
-
-
-
-
-                   $(api.column(4).footer()).html("Total");
+                    $(api.column(4).footer()).html("Total");
                     $(api.column(4).footer()).html(formatNumber(bGenerados, 0));
-                    $(api.column(5).footer()).html(formatNumber(bPases, 0));
 
-                    $(api.column(6).footer()).html(formatNumber(voucherYprep, 0));
-                    $(api.column(7).footer()).html(formatNumber(bExpFisYrot, 0));
-                    $(api.column(8).footer()).html(formatNumber(boletosCobrados, 0));
-                    $(api.column(9).footer()).html(formatNumber(porcentajeCobrado, 2)+"&nbsp;%");
-                    $(api.column(10).footer()).html(formatNumber(boletosSinCobro, 0));
-                    $(api.column(11).footer()).html(formatNumber(boletosRegresados, 0));
-                    $(api.column(12).footer()).html(formatNumber(diferencia, 0));
-                    $(api.column(13).footer()).html(formatNumber(promedioPorcentaje, 2)+"&nbsp;%");
-                    $(api.column(14).footer()).html(formatNumber(bolPerdido, 2)+"&nbsp;%");
-                    $(api.column(15).footer()).html("$&nbsp;" + formatNumber(ingresoBoletaje, 0));
+                    $(api.column(5).footer()).html(formatNumber(voucherYprep, 0));
+                    $(api.column(6).footer()).html(formatNumber(bExpFisYrot, 0));
+                    $(api.column(7).footer()).html(formatNumber(boletosCobrados, 0));
+                    $(api.column(8).footer()).html(formatNumber(porcentajeCobrado, 2)+"&nbsp;");
+                    $(api.column(9).footer()).html(formatNumber(boletosSinCobro, 0));
+                    $(api.column(10).footer()).html(formatNumber(boletosRegresados, 0));
+                    $(api.column(11).footer()).html(formatNumber(diferencia, 0));
+                    $(api.column(12).footer()).html(formatNumber(promedioPorcentaje, 2)+"&nbsp;%");
+                    $(api.column(13).footer()).html(formatNumber(bolPerdido, 2)+"&nbsp;%");
+                    $(api.column(14).footer()).html("$&nbsp;" + formatNumber(ingresoBoletaje, 0));
                   
 
-                    $(api.column(16).footer()).html("$&nbsp;" + formatNumber(ingresoPensiones, 0));
-
-
-                    $(api.column(18).footer()).html("$&nbsp;" + formatNumber(ingresoOtros, 0));
-                    $(api.column(19).footer()).html("$&nbsp;" + formatNumber(ingresoGeneral, 0));
+                    $(api.column(15).footer()).html("$&nbsp;" + formatNumber(ingresoPensiones, 0));
+                    $(api.column(17).footer()).html("$&nbsp;" + formatNumber(ingresoOtros, 0));
+                    $(api.column(18).footer()).html("$&nbsp;" + formatNumber(ingresoGeneral, 0));
 
                     if($("input[name='date']:checked").val() == 'mes'){
                         var fecha = $("#fechaMes").val();
                         var estacionamiento_id = $("#estacionamiento").val();
-                        $(api.column(21).footer()).html(`<div><button onclick="window.open('detalleMes/`+fecha+`_`+estacionamiento_id+`', '_blank')" class="detalle" data-toggle="tooltip" data-placement="top" title="Detalle Mes"><i class="fas fa-eye"></i></button></div>`);
-                        $(api.column(22).footer()).html(`<div><button class="imprimir" data-toggle="tooltip" data-placement="top" title="Cedula Mes" onclick="window.open('imprimirCedulaMes/`+fecha+`/`+estacionamiento_id+`','name','width=1000,height=600')" target="_blank"><i class="fas fa-print"></i></button></div>`);
+                        $(api.column(20).footer()).html(`<div><button onclick="window.open('detalleMes/`+fecha+`_`+estacionamiento_id+`', '_blank')" class="detalle" data-toggle="tooltip" data-placement="top" title="Detalle Mes"><i class="fas fa-eye"></i></button></div>`);
+                        $(api.column(21).footer()).html(`<div><button class="imprimir" data-toggle="tooltip" data-placement="top" title="Cedula Mes" onclick="window.open('imprimirCedulaMes/`+fecha+`/`+estacionamiento_id+`','name','width=1000,height=600')" target="_blank"><i class="fas fa-print"></i></button></div>`);
                     } else if($("input[name='date']:checked").val() == 'semana'){
                         var fecha = $("#fechaSemana").val();
                         var estacionamiento_id = $("#estacionamiento").val();
-                        $(api.column(21).footer()).html(`<div><button onclick="window.open('detalleSemana/`+fecha+`_`+estacionamiento_id+`', '_blank')" class="detalle" data-toggle="tooltip" data-placement="top" title="Detalle Semana"><i class="fas fa-eye"></i></button></div>`);
-                        $(api.column(22).footer()).html(`<div><button class="imprimir" data-toggle="tooltip" data-placement="top" title="Cedula Semana" onclick="window.open('imprimirCedulaSemana/`+fecha+`/`+estacionamiento_id+`','name','width=1000,height=600')" target="_blank"><i class="fas fa-print"></i></button></div>`);
+                        $(api.column(20).footer()).html(`<div><button onclick="window.open('detalleSemana/`+fecha+`_`+estacionamiento_id+`', '_blank')" class="detalle" data-toggle="tooltip" data-placement="top" title="Detalle Semana"><i class="fas fa-eye"></i></button></div>`);
+                        $(api.column(21).footer()).html(`<div><button class="imprimir" data-toggle="tooltip" data-placement="top" title="Cedula Semana" onclick="window.open('imprimirCedulaSemana/`+fecha+`/`+estacionamiento_id+`','name','width=1000,height=600')" target="_blank"><i class="fas fa-print"></i></button></div>`);
                     }
                 },
                 // "rowCallback": function( row, data ) {
